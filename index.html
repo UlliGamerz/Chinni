@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Happy 22nd Birthday, Chini Bhai 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --gold: #f5c842;
+    --orange: #ff7c2a;
+    --pink: #ff4d8d;
+    --deep: #0b0a12;
+    --card: #13111f;
+    --soft: #1e1b2e;
+    --text: #f0ebff;
+    --muted: #9b91c1;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--deep);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ─── CUSTOM CURSOR ─── */
+  #cursor {
+    position: fixed; width: 18px; height: 18px;
+    border-radius: 50%; background: var(--gold);
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform .12s ease, opacity .2s;
+    mix-blend-mode: difference;
+  }
+  #cursor-ring {
+    position: fixed; width: 44px; height: 44px;
+    border-radius: 50%; border: 2px solid var(--gold);
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: transform .35s cubic-bezier(.18,.89,.32,1.28), opacity .2s;
+    opacity: .5;
+  }
+
+  /* ─── CANVAS ─── */
+  #confetti-canvas {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 1;
+  }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    text-align: center; padding: 2rem;
+    z-index: 2;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,200,66,.18) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(255,77,141,.12) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 50% at 20% 90%, rgba(255,124,42,.1) 0%, transparent 60%),
+      var(--deep);
+    z-index: 0;
+  }
+
+  .hero-content { position: relative; z-index: 2; }
+
+  .tag {
+    display: inline-block;
+    background: rgba(245,200,66,.12);
+    border: 1px solid rgba(245,200,66,.3);
+    color: var(--gold);
+    font-size: .75rem; letter-spacing: .15em; text-transform: uppercase;
+    padding: .4rem 1.1rem; border-radius: 50px;
+    margin-bottom: 1.8rem;
+    animation: fadeDown .8s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 14vw, 10rem);
+    line-height: .95;
+    letter-spacing: .02em;
+    background: linear-gradient(135deg, #fff 0%, var(--gold) 40%, var(--orange) 70%, var(--pink) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    animation: fadeUp .9s .1s ease both;
+  }
+
+  .hero-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: clamp(1.1rem, 3vw, 1.6rem);
+    color: var(--muted); margin-top: .5rem;
+    animation: fadeUp .9s .25s ease both;
+  }
+
+  .hero-date {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.4rem, 5vw, 2.5rem);
+    letter-spacing: .2em;
+    color: var(--gold);
+    margin-top: 1rem;
+    animation: fadeUp .9s .35s ease both;
+  }
+
+  /* ─── COUNTDOWN ─── */
+  #countdown-wrap {
+    display: flex; gap: 1.5rem; justify-content: center;
+    margin-top: 2.5rem;
+    animation: fadeUp .9s .5s ease both;
+    flex-wrap: wrap;
+  }
+  .countdown-box {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(245,200,66,.2);
+    border-radius: 16px; padding: 1rem 1.4rem;
+    min-width: 80px; text-align: center;
+    backdrop-filter: blur(8px);
+    transition: transform .2s, border-color .2s;
+  }
+  .countdown-box:hover { transform: translateY(-4px); border-color: var(--gold); }
+  .count-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    background: linear-gradient(135deg, #fff, var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    display: block; line-height: 1;
+  }
+  .count-label {
+    font-size: .65rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted);
+    margin-top: .3rem; display: block;
+  }
+
+  .birthday-btn {
+    margin-top: 2.5rem;
+    display: inline-block;
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    color: #000; font-weight: 600; font-size: 1rem;
+    padding: .85rem 2.2rem; border-radius: 50px;
+    border: none; cursor: none; text-decoration: none;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 0 40px rgba(245,200,66,.35);
+    animation: fadeUp .9s .65s ease both;
+    letter-spacing: .05em;
+  }
+  .birthday-btn:hover {
+    transform: scale(1.06);
+    box-shadow: 0 0 60px rgba(245,200,66,.5);
+  }
+
+  /* ─── TIMELINE "BIRTHDAY WEEK" ─── */
+  #bweek {
+    position: relative; z-index: 2;
+    padding: 5rem 2rem;
+    max-width: 700px; margin: 0 auto;
+    text-align: center;
+  }
+
+  .section-label {
+    font-size: .7rem; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: .7rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    margin-bottom: 3rem; line-height: 1.2;
+  }
+
+  .bday-timeline {
+    display: flex; flex-direction: column; gap: 0;
+    position: relative;
+  }
+  .bday-timeline::before {
+    content: '';
+    position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(180deg, transparent, var(--gold), var(--pink), transparent);
+    transform: translateX(-50%);
+  }
+
+  .bday-card {
+    display: flex; align-items: center;
+    gap: 2rem; padding: 1.5rem 0;
+    position: relative;
+  }
+  .bday-card:nth-child(odd) { flex-direction: row-reverse; }
+  .bday-card:nth-child(odd) .bday-info { text-align: left; }
+  .bday-card:nth-child(even) .bday-info { text-align: right; }
+
+  .bday-dot {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; flex-shrink: 0; position: relative; z-index: 2;
+    border: 3px solid;
+    background: var(--card);
+    transition: transform .3s;
+  }
+  .bday-dot:hover { transform: scale(1.15) rotate(10deg); }
+  .bday-card:nth-child(1) .bday-dot { border-color: #ff9ecc; }
+  .bday-card:nth-child(2) .bday-dot { border-color: #7ec8ff; }
+  .bday-card:nth-child(3) .bday-dot {
+    border-color: var(--gold);
+    box-shadow: 0 0 30px rgba(245,200,66,.6);
+    background: linear-gradient(135deg, #1e1b2e, #2a2040);
+    width: 70px; height: 70px; font-size: 2rem;
+  }
+
+  .bday-info { flex: 1; }
+  .bday-date-tag {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem; letter-spacing: .1em; color: var(--muted);
+  }
+  .bday-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700;
+  }
+  .bday-card:nth-child(1) .bday-name { color: #ff9ecc; }
+  .bday-card:nth-child(2) .bday-name { color: #7ec8ff; }
+  .bday-card:nth-child(3) .bday-name {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .bday-note { font-size: .9rem; color: var(--muted); margin-top: .2rem; }
+
+  /* ─── ABOUT SECTION ─── */
+  #about {
+    position: relative; z-index: 2;
+    padding: 4rem 2rem 6rem;
+  }
+  .about-inner {
+    max-width: 900px; margin: 0 auto;
+  }
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem; margin-top: 2rem;
+  }
+
+  .trait-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 20px; padding: 1.8rem 1.5rem;
+    transition: transform .3s, border-color .3s, box-shadow .3s;
+    position: relative; overflow: hidden;
+  }
+  .trait-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(245,200,66,.06), transparent 60%);
+    opacity: 0; transition: opacity .3s;
+  }
+  .trait-card:hover { transform: translateY(-6px); border-color: rgba(245,200,66,.3); }
+  .trait-card:hover::before { opacity: 1; }
+  .trait-card:hover { box-shadow: 0 20px 50px rgba(0,0,0,.4); }
+
+  .trait-icon { font-size: 2.2rem; margin-bottom: .8rem; }
+  .trait-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem; font-weight: 700; margin-bottom: .4rem;
+  }
+  .trait-desc { font-size: .88rem; color: var(--muted); line-height: 1.6; }
+
+  /* ─── BIG MESSAGE ─── */
+  #message {
+    position: relative; z-index: 2;
+    padding: 5rem 2rem;
+    text-align: center;
+    background: linear-gradient(180deg, transparent, rgba(245,200,66,.04), transparent);
+  }
+  .message-inner { max-width: 750px; margin: 0 auto; }
+  .message-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 3.5vw, 2rem);
+    line-height: 1.6; font-style: italic;
+    color: rgba(240,235,255,.9);
+  }
+  .message-quote em { color: var(--gold); font-style: normal; font-weight: 700; }
+  .message-from {
+    margin-top: 2rem; font-size: .85rem;
+    letter-spacing: .1em; color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* ─── INSTAGRAM ─── */
+  #ig-section {
+    position: relative; z-index: 2;
+    text-align: center; padding: 3rem 2rem 6rem;
+  }
+  .ig-card {
+    display: inline-flex; align-items: center; gap: 1rem;
+    background: linear-gradient(135deg, rgba(245,200,66,.1), rgba(255,77,141,.08));
+    border: 1px solid rgba(245,200,66,.25);
+    border-radius: 60px; padding: 1rem 2rem;
+    text-decoration: none; color: var(--text);
+    transition: transform .25s, box-shadow .25s;
+    font-size: 1.1rem; font-weight: 500;
+  }
+  .ig-card:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 50px rgba(245,200,66,.2);
+  }
+  .ig-handle { color: var(--gold); font-weight: 700; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative; z-index: 2;
+    text-align: center; padding: 2rem;
+    color: var(--muted); font-size: .8rem;
+    border-top: 1px solid rgba(255,255,255,.05);
+  }
+
+  /* ─── KEYFRAMES ─── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 30px rgba(245,200,66,.4); }
+    50% { box-shadow: 0 0 70px rgba(245,200,66,.8); }
+  }
+
+  /* celebrate state */
+  body.celebrating #hero { animation: pulse-bg .6s ease; }
+  @keyframes pulse-bg {
+    0%,100% { background-size: 100%; }
+    50% { background-size: 105%; }
+  }
+
+  /* scroll reveal */
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ─── FLOATING EMOJIS ─── */
+  .floater {
+    position: fixed; font-size: 1.8rem;
+    pointer-events: none; z-index: 3;
+    animation: floatUp 3s ease forwards;
+  }
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: translateY(-300px) scale(1.5) rotate(30deg); }
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 600px) {
+    .bday-card { flex-direction: column !important; text-align: center !important; gap: .8rem; }
+    .bday-info { text-align: center !important; }
+    .bday-timeline::before { left: 50%; }
+    #countdown-wrap { gap: .8rem; }
+    .countdown-box { min-width: 64px; padding: .8rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ══════ HERO ══════ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="tag">🎂 April 7, 2026 · 22nd Birthday</div>
+    <h1 class="hero-title">Happy Birthday<br>Chini Bhai</h1>
+    <p class="hero-sub">The sweetest soul in our circle ✨</p>
+    <p class="hero-date">07 · 04 · 2026</p>
+
+    <div id="countdown-wrap">
+      <div class="countdown-box">
+        <span class="count-num" id="cd-days">00</span>
+        <span class="count-label">Days</span>
+      </div>
+      <div class="countdown-box">
+        <span class="count-num" id="cd-hrs">00</span>
+        <span class="count-label">Hours</span>
+      </div>
+      <div class="countdown-box">
+        <span class="count-num" id="cd-min">00</span>
+        <span class="count-label">Mins</span>
+      </div>
+      <div class="countdown-box">
+        <span class="count-num" id="cd-sec">00</span>
+        <span class="count-label">Secs</span>
+      </div>
+    </div>
+
+    <button class="birthday-btn" onclick="celebrate()">🎉 Send Love!</button>
+  </div>
+</section>
+
+<!-- ══════ BIRTHDAY WEEK ══════ -->
+<section id="bweek">
+  <div class="section-label reveal">The Legendary Birthday Week</div>
+  <h2 class="section-title reveal">Three days. Three legends. 🔥</h2>
+
+  <div class="bday-timeline">
+    <div class="bday-card reveal">
+      <div class="bday-dot">💜</div>
+      <div class="bday-info">
+        <div class="bday-date-tag">April 5</div>
+        <div class="bday-name">Arpita</div>
+        <div class="bday-note">The one who kicked off the celebrations 🎀</div>
+      </div>
+    </div>
+
+    <div class="bday-card reveal">
+      <div class="bday-dot">💙</div>
+      <div class="bday-info">
+        <div class="bday-date-tag">April 6</div>
+        <div class="bday-name">Rachit</div>
+        <div class="bday-note">Day two of the trio — keeping the energy alive 🔵</div>
+      </div>
+    </div>
+
+    <div class="bday-card reveal">
+      <div class="bday-dot">⭐</div>
+      <div class="bday-info">
+        <div class="bday-date-tag">April 7 · The Grand Finale</div>
+        <div class="bday-name">Chini Bhai 👑</div>
+        <div class="bday-note">@oyesinuu · Turning 22 & better than ever!</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ ABOUT ══════ -->
+<section id="about">
+  <div class="about-inner">
+    <div class="section-label reveal" style="text-align:center">Who is Chini Bhai?</div>
+    <h2 class="section-title reveal" style="text-align:center">One of a kind, fr. 💛</h2>
+
+    <div class="about-grid">
+      <div class="trait-card reveal">
+        <div class="trait-icon">🍬</div>
+        <div class="trait-title">Sweeter than Sugar</div>
+        <div class="trait-desc">Hence the name — his vibes, his energy, his words. Never met someone so genuinely kind.</div>
+      </div>
+      <div class="trait-card reveal">
+        <div class="trait-icon">😌</div>
+        <div class="trait-title">Humble to the Core</div>
+        <div class="trait-desc">No ego, no drama. Just good energy and real ones. The rarest trait in today's world.</div>
+      </div>
+      <div class="trait-card reveal">
+        <div class="trait-icon">😂</div>
+        <div class="trait-title">Laughed with Us All</div>
+        <div class="trait-desc">Every meme, every late-night convo, every chaotic moment — Chini was there making it better.</div>
+      </div>
+      <div class="trait-card reveal">
+        <div class="trait-icon">👀</div>
+        <div class="trait-title">Seen Things Together</div>
+        <div class="trait-desc">Shared moments, shared memories — built something real with this circle and we're here for it.</div>
+      </div>
+      <div class="trait-card reveal">
+        <div class="trait-icon">🤝</div>
+        <div class="trait-title">Bangwing IN 🔥</div>
+        <div class="trait-desc">Joined the community and fit in like he was always meant to be here. That's just his magic.</div>
+      </div>
+      <div class="trait-card reveal">
+        <div class="trait-icon">✨</div>
+        <div class="trait-title">Coolest Friend, Always</div>
+        <div class="trait-desc">The guy you wanna have around. Not just cool — the right kind of cool. Chilled, real, solid.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ MESSAGE ══════ -->
+<section id="message">
+  <div class="message-inner reveal">
+    <p class="message-quote">
+      "Happy 22nd, <em>Chini Bhai</em>. You came into this circle and made it warmer, louder, and infinitely more fun. Every laugh shared, every moment lived — it's better because you were in it. Here's to 22 being your most <em>iconic</em> year yet. We love you more than words, bhai. 🎂🧡"
+    </p>
+    <div class="message-from">— Your people, always 💛 · Arpita · Rachit · &amp; the whole circle</div>
+  </div>
+</section>
+
+<!-- ══════ INSTAGRAM ══════ -->
+<section id="ig-section">
+  <div class="section-label reveal">Find Him On</div>
+  <br/>
+  <a class="ig-card reveal" href="https://instagram.com/oyesinuu" target="_blank" rel="noopener">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+    </svg>
+    <span class="ig-handle">@oyesinuu</span>
+    <span style="color:var(--muted); font-size:.9rem;">· wish him directly!</span>
+  </a>
+</section>
+
+<footer>
+  Made with 💛 for <strong>Chini Bhai</strong> · 22 on April 7, 2026 · @oyesinuu
+</footer>
+
+<script>
+  // ─── CURSOR ───
+  const cur = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  document.addEventListener('mousemove', e => {
+    cur.style.left = e.clientX + 'px';
+    cur.style.top = e.clientY + 'px';
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
+  });
+
+  // ─── COUNTDOWN ───
+  function updateCountdown() {
+    const target = new Date('2026-04-07T00:00:00');
+    const now = new Date();
+    const diff = target - now;
+
+    if (diff <= 0) {
+      document.getElementById('cd-days').textContent = '00';
+      document.getElementById('cd-hrs').textContent = '00';
+      document.getElementById('cd-min').textContent = '00';
+      document.getElementById('cd-sec').textContent = '🎂';
+      return;
+    }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    document.getElementById('cd-days').textContent = String(d).padStart(2,'0');
+    document.getElementById('cd-hrs').textContent = String(h).padStart(2,'0');
+    document.getElementById('cd-min').textContent = String(m).padStart(2,'0');
+    document.getElementById('cd-sec').textContent = String(s).padStart(2,'0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // ─── CONFETTI ───
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  const colors = ['#f5c842','#ff7c2a','#ff4d8d','#a78bfa','#7ec8ff','#fff'];
+  let particles = [];
+
+  class Particle {
+    constructor(x, y) {
+      this.x = x || Math.random() * canvas.width;
+      this.y = y || -10;
+      this.vx = (Math.random() - .5) * 6;
+      this.vy = Math.random() * 4 + 1.5;
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.size = Math.random() * 8 + 4;
+      this.rot = Math.random() * 360;
+      this.rotSpeed = (Math.random() - .5) * 6;
+      this.shape = Math.floor(Math.random() * 3);
+      this.life = 1;
+      this.decay = Math.random() * .008 + .003;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.rot += this.rotSpeed;
+      this.vy += .06;
+      this.life -= this.decay;
+    }
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = this.life;
+      ctx.fillStyle = this.color;
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rot * Math.PI / 180);
+      if (this.shape === 0) { // rect
+        ctx.fillRect(-this.size/2, -this.size/4, this.size, this.size/2);
+      } else if (this.shape === 1) { // circle
+        ctx.beginPath();
+        ctx.arc(0, 0, this.size/2.5, 0, Math.PI * 2);
+        ctx.fill();
+      } else { // star
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const a = (i * 4 * Math.PI) / 5 - Math.PI/2;
+          const r = i % 2 === 0 ? this.size/2 : this.size/4;
+          ctx[i===0?'moveTo':'lineTo'](Math.cos(a)*r, Math.sin(a)*r);
+        }
+        ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  let animId;
+  function animateConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles = particles.filter(p => p.life > 0 && p.y < canvas.height + 20);
+    particles.forEach(p => { p.update(); p.draw(); });
+    animId = requestAnimationFrame(animateConfetti);
+  }
+  animateConfetti();
+
+  function burst(x, y, count = 60) {
+    for (let i = 0; i < count; i++) {
+      const p = new Particle(x, y);
+      p.vx = (Math.random() - .5) * 12;
+      p.vy = (Math.random() - .5) * 10 - 5;
+      p.decay = .012;
+      particles.push(p);
+    }
+  }
+
+  function celebrate() {
+    burst(window.innerWidth / 2, window.innerHeight / 2, 120);
+    // floating emoji
+    const emojis = ['🎉','🎂','🎈','✨','🥳','💛','🌟','🎊'];
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => {
+        const el = document.createElement('div');
+        el.className = 'floater';
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.left = (20 + Math.random() * 60) + 'vw';
+        el.style.bottom = '10vh';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 3000);
+      }, i * 100);
+    }
+  }
+
+  // rain on idle
+  setInterval(() => {
+    if (Math.random() < .3) {
+      particles.push(new Particle(Math.random() * canvas.width, -10));
+    }
+  }, 200);
+
+  // click burst
+  document.addEventListener('click', e => {
+    burst(e.clientX, e.clientY, 30);
+  });
+
+  // ─── SCROLL REVEAL ───
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: .12 });
+  reveals.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
